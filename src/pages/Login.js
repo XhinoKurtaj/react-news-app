@@ -12,7 +12,8 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+
+import API from "../config/axiosConfig";
 
 function Copyright(props) {
   return (
@@ -36,7 +37,8 @@ const theme = createTheme();
 
 export default function Login() {
   const navigate = useNavigate();
-  const handleSubmit = (event) => {
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
@@ -45,25 +47,13 @@ export default function Login() {
       password: data.get("password"),
     });
 
-    let config = {
-      method: "post",
-      url: "auth/login",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: payload,
-    };
-
-    axios
-      .request(config)
-      .then((response) => {
-        localStorage.setItem("token", response.data.token);
-
-        navigate("/");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const response = await API.post("auth/login", payload);
+      localStorage.setItem("token", response.data.token);
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

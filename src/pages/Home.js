@@ -25,6 +25,8 @@ import Grid from "@mui/material/Grid";
 import LoadingSpinner from "../components/LoadingSpinner";
 import NewsGrid from "../components/NewsGrid";
 
+import API from "../config/axiosConfig";
+
 function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" align="center">
@@ -65,33 +67,23 @@ export default function Home() {
   // }, []);
 
   const handleSubmit = async (event) => {
+    setIsLoading(true);
     event.preventDefault();
-
     const form = new FormData(event.currentTarget);
 
-    setIsLoading(true);
     const payload = {
       criteria: form.get("criteria"),
       fromDate: form.get("date"),
       source: form.get("source"),
     };
-
-    const config = {
-      method: "get",
-      url: "news",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      params: payload,
-    };
-
+    debugger;
     try {
-      const response = await axios(config);
+      const response = await API.get("news", { params: payload });
       setArticles(response.data.articles);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
+
     setIsLoading(false);
   };
 

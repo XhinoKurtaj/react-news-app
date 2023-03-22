@@ -17,6 +17,8 @@ import axios from "axios";
 import { isAuthenticated } from "../authentication/isAuthenticated";
 import { useNavigate } from "react-router-dom";
 
+import API from "../config/axiosConfig";
+
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -40,24 +42,14 @@ function Navbar() {
     setAnchorElUser(null);
   };
 
-  const logout = () => {
-    let config = {
-      method: "get",
-      url: "auth/logout",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    };
-
-    axios
-      .request(config)
-      .then((response) => {
-        localStorage.removeItem("token");
-        navigate("/login");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const logout = async () => {
+    try {
+      await API.get("auth/logout");
+      localStorage.removeItem("token");
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
