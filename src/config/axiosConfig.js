@@ -1,4 +1,5 @@
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const API = axios.create({
   baseURL: `http://localhost:8000/api/`,
@@ -16,5 +17,32 @@ API.interceptors.request.use((config) => {
   }
   return config;
 });
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      const errorMessage = error.response.data.message;
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    } else if (error.request) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No response received from server.",
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message,
+      });
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default API;

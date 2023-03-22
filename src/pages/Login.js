@@ -47,13 +47,9 @@ export default function Login() {
       password: data.get("password"),
     });
 
-    try {
-      const response = await API.post("auth/login", payload);
-      localStorage.setItem("token", response.data.token);
-      navigate("/");
-    } catch (err) {
-      console.log(err);
-    }
+    const response = await API.post("auth/login", payload);
+    localStorage.setItem("token", response.data.token);
+    navigate("/");
   };
 
   return (

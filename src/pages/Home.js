@@ -72,17 +72,14 @@ export default function Home() {
     const form = new FormData(event.currentTarget);
 
     const payload = {
-      criteria: form.get("criteria"),
+      criteria: form.get("keyword"),
       fromDate: form.get("date"),
       source: form.get("source"),
+      category: form.get("category"),
     };
-    debugger;
-    try {
-      const response = await API.get("news", { params: payload });
-      setArticles(response.data.articles);
-    } catch (err) {
-      console.log(err);
-    }
+
+    const response = await API.get("news", { params: payload });
+    setArticles(response.data.articles);
 
     setIsLoading(false);
   };
@@ -104,10 +101,10 @@ export default function Home() {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  name="criteria"
-                  label="criteria"
+                  name="keyword"
+                  label="keyword"
                   type="text"
-                  id="criteria"
+                  id="keyword"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -120,6 +117,15 @@ export default function Home() {
                 />
               </Grid>
 
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  name="category"
+                  label="category"
+                  type="text"
+                  id="category"
+                />
+              </Grid>
               <Grid item xs={12}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateField
