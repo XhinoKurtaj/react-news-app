@@ -25,7 +25,6 @@ const ExpandMore = styled((props) => {
 }));
 
 export default function NewsCard(props) {
-  debugger;
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea>

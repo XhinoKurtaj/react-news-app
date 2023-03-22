@@ -43,7 +43,7 @@ function Navbar() {
   const logout = () => {
     let config = {
       method: "get",
-      url: "logout",
+      url: "auth/logout",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

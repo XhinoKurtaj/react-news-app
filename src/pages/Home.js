@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from "react";
-import AppBar from "@mui/material/AppBar";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import CssBaseline from "@mui/material/CssBaseline";
-import Grid from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Navbar from "../components/Nav";
-import NewsCard from "../components/NewsCard";
 import axios from "axios";
+import Button from "@mui/material/Button";
+
+import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
+
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateField } from "@mui/x-date-pickers/DateField";
+import dayjs from "dayjs";
+
+import SearchIcon from "@mui/icons-material/Search";
+import Divider from "@mui/material/Divider";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+
+import LoadingSpinner from "../components/LoadingSpinner";
+import NewsGrid from "../components/NewsGrid";
 
 function Copyright() {
   return (
@@ -33,27 +41,59 @@ function Copyright() {
 const theme = createTheme();
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(false);
   const [articles, setArticles] = useState([]);
+  const [value, setValue] = React.useState("");
 
-  useEffect(() => {
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url: "http://localhost:8000/api/news",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const response = await axios.get("http://localhost:8000/api/news", {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       });
+  //       setIsLoading(false);
+  //       setArticles(response.data.articles);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const form = new FormData(event.currentTarget);
+
+    setIsLoading(true);
+    const payload = {
+      criteria: form.get("criteria"),
+      fromDate: form.get("date"),
+      source: form.get("source"),
     };
 
-    axios
-      .request(config)
-      .then((response) => {
-        setArticles(response.data.articles);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    const config = {
+      method: "get",
+      url: "news",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      params: payload,
+    };
+
+    try {
+      const response = await axios(config);
+      setArticles(response.data.articles);
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -61,54 +101,60 @@ export default function Home() {
       <CssBaseline />
 
       <main>
-        {/* Hero unit */}
-        <Box
-          sx={{
-            bgcolor: "background.paper",
-            pt: 8,
-            pb: 6,
-          }}
-        >
-          <Container maxWidth="sm">
-            <Typography
-              component="h1"
-              variant="h2"
-              align="center"
-              color="text.primary"
-              gutterBottom
-            >
-              Album layout
-            </Typography>
-            <Typography
-              variant="h5"
-              align="center"
-              color="text.secondary"
-              paragraph
-            >
-              Something short and leading about the collection below—its
-              contents, the creator, etc. Make it short and sweet, but not too
-              short so folks don&apos;t simply skip over it entirely.
-            </Typography>
-            <Stack
-              sx={{ pt: 4 }}
-              direction="row"
-              spacing={2}
-              justifyContent="center"
-            >
-              <Button variant="contained">Main call to action</Button>
-              <Button variant="outlined">Secondary action</Button>
-            </Stack>
-          </Container>
-        </Box>
-        <Container >
-          <Grid container spacing={2}>
-            {articles.map((article) => (
-              <Grid item key={article} xs={12} sm={6} md={4}>
-                <NewsCard article={article} />
+        <Container maxWidth="sm">
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit}
+            sx={{ mt: 3 }}
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  name="criteria"
+                  label="criteria"
+                  type="text"
+                  id="criteria"
+                />
               </Grid>
-            ))}
-          </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  name="source"
+                  label="source"
+                  type="text"
+                  id="source"
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateField
+                    label="From Date"
+                    name="date"
+                    id="date"
+                    value={value}
+                    onChange={(newValue) => setValue(newValue)}
+                    format="YYYY-MM-DD"
+                  />
+                </LocalizationProvider>
+              </Grid>
+            </Grid>
+            <Button
+              variant="outlined"
+              type="submit"
+              fullWidth
+              startIcon={<SearchIcon />}
+            >
+              Search
+            </Button>
+          </Box>
         </Container>
+
+        <Divider variant="middle" />
+        <br />
+        {isLoading ? <LoadingSpinner /> : <NewsGrid articles={articles} />}
       </main>
       {/* Footer */}
       <Box sx={{ bgcolor: "background.paper", p: 6 }} component="footer">

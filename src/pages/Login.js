@@ -47,7 +47,7 @@ export default function Login() {
 
     let config = {
       method: "post",
-      url: "login",
+      url: "auth/login",
       headers: {
         "Content-Type": "application/json",
       },

@@ -46,7 +46,7 @@ export default function Register() {
 
     let config = {
       method: "post",
-      url: "register",
+      url: "auth/register",
       headers: {
         "Content-Type": "application/json",
       },
