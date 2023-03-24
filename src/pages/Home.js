@@ -15,25 +15,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import Divider from "@mui/material/Divider";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
-import Nav from "../components/Navbar/Navbar";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import NewsGrid from "../components/NewsGrid";
 
 import API from "../config/axiosConfig";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import Feed from "../components/Feeds/Feed";
 
 const theme = createTheme();
 
@@ -50,7 +38,7 @@ export default function Home() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const payload = {
-      criteria: form.get("keyword"),
+      keyword: form.get("keyword"),
       source: form.get("source"),
       category: form.get("category"),
     };
@@ -69,21 +57,42 @@ export default function Home() {
     setIsLoading(false);
   };
 
+  const formatDate = () => {
+    var d = new Date(),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
+  const feedSearch = async (item) => {
+    const payload = {
+      [item.type]: item.feed.trim(),
+      fromDate: formatDate().trim(),
+    };
+    const response = await API.get("news", { params: payload });
+    debugger;
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Navbar />
       <CssBaseline />
 
       <main>
-        <Container maxWidth="sm">
+        <Container maxWidth="lg">
           <Box
             component="form"
             noValidate
             onSubmit={handleSubmit}
             sx={{ mt: 3 }}
           >
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={1}>
+              <Grid item xs={12} lg={3}>
                 <TextField
                   fullWidth
                   name="keyword"
@@ -94,7 +103,7 @@ export default function Home() {
                   onChange={(event) => setCriteria(event.target.value)}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} lg={3}>
                 <TextField
                   fullWidth
                   name="source"
@@ -107,7 +116,7 @@ export default function Home() {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={12} lg={3}>
                 <TextField
                   fullWidth
                   name="category"
@@ -119,7 +128,7 @@ export default function Home() {
                   disabled={source.length > 0}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} lg={3}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateField
                     label="From Date"
@@ -144,25 +153,15 @@ export default function Home() {
         </Container>
 
         <Divider variant="middle" />
+
         <br />
+
+        <Feed searchByFeed={feedSearch} />
+
+        <br />
+        <Divider variant="middle" />
         {isLoading ? <LoadingSpinner /> : <NewsGrid articles={articles} />}
       </main>
-      {/* Footer */}
-      <Box sx={{ bgcolor: "background.paper", p: 6 }} component="footer">
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          color="text.secondary"
-          component="p"
-        >
-          Something here to give the footer a purpose!
-        </Typography>
-        <Copyright />
-      </Box>
-      {/* End footer */}
     </ThemeProvider>
   );
 }
