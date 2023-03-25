@@ -64,17 +64,6 @@ export default function Feed(props) {
                 </Grid>
               ))}
             </Grid>
-            {/* <Chip
-              label="Clickable Deletable"
-              onClick={handleClick}
-              onDelete={handleDelete}
-            />
-            <Chip
-              label="Clickable Deletable"
-              variant="outlined"
-              onClick={handleClick}
-              onDelete={handleDelete}
-            /> */}
           </Stack>
         </Grid>
         <Grid item xs={12} lg={2}>

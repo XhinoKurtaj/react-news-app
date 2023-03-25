@@ -2,8 +2,8 @@ export const Pages = [
   {
     id: 0,
     // icon: <PeopleIcon />,
-    label: "News",
-    route: "news",
+    label: "NewsAPI",
+    route: "newsapi",
   },
   {
     id: 1,

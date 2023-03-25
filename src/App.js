@@ -4,12 +4,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 // import NewYorkTimes from "./pages/NewYorkTimes";
 // import TheGuardian from "./pages/TheGuardian";
-import News from "./pages/News";
+// import News from "./pages/News";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ProtectedRoute from "./authentication/authGuard";
 import NewYorkTimes from "./components/NewYorkTimes";
 import TheGuardian from "./components/TheGuardian";
+import NewsAPI from "./components/NewsAPI";
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/news" element={<News />} />
+            <Route path="/newsapi" element={<NewsAPI />} />
             <Route path="/theguardian" element={<TheGuardian />} />
             <Route path="/newyorktimes" element={<NewYorkTimes />} />
           </Route>

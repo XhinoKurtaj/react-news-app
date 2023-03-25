@@ -1,55 +1,39 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Container } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import dayjs from "dayjs";
-
 import ArticleList from "./articles";
 import SearchForm from "../Search/Search";
 import PaginationControlled from "../Pagination/Pagination";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
-import Feed from "../Feeds/Feed";
+import dayjs from "dayjs";
 
+import Feed from "../Feeds/Feed";
 import API from "../../config/axiosConfig";
 
 const theme = createTheme();
-export default function TheGuardian() {
+export default function NewsAPI() {
   const [isLoading, setIsLoading] = useState(false);
   const [articles, setArticles] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
-  const [resultsPerPage, setResultsPerPage] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [seachData, setSearchData] = useState({});
+  const itemsPerPage = 10;
 
   const handleSearch = async (payload) => {
     setIsLoading(true);
-    setSearchData(payload);
-    payload.currentPage = currentPage;
-
-    const response = await API.get("guardian/news", { params: payload });
+    const response = await API.get("newsapi/news", { params: payload });
     setArticles(response.data.articles);
-    setTotalResults(response.data.totalResults);
-    setResultsPerPage(response.data.resultsPerPage);
-    setCurrentPage(response.data.currentPage);
-    setLastPage(response.data.lastPage);
     setIsLoading(false);
   };
 
+  const chunkOfArticles = articles.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const handlePageChange = async (event, value) => {
-    setIsLoading(true);
-    const payload = {
-      ...seachData,
-      page: value,
-    };
-
-    const response = await API.get("guardian/news", { params: payload });
-
-    setArticles(response.data.articles);
-    setTotalResults(response.data.totalResults);
-    setResultsPerPage(response.data.resultsPerPage);
-    setCurrentPage(value);
-    setLastPage(response.data.lastPage);
-    setIsLoading(false);
+    if (value <= Math.ceil(articles.length / itemsPerPage)) {
+      setCurrentPage(value);
+    }
   };
 
   const feedSearch = async (item) => {
@@ -63,7 +47,7 @@ export default function TheGuardian() {
 
   return (
     <ThemeProvider theme={theme}>
-      <h1>The Guardian</h1>
+      <h1>NewsAPI</h1>
       <main>
         <Container maxWidth="lg">
           <SearchForm onSearch={handleSearch} />
@@ -74,7 +58,7 @@ export default function TheGuardian() {
             <LoadingSpinner />
           ) : (
             <>
-              <ArticleList articles={articles} />
+              <ArticleList articles={chunkOfArticles} />
               <br />
             </>
           )}
@@ -82,7 +66,7 @@ export default function TheGuardian() {
           {articles.length > 0 ? (
             <PaginationControlled
               currentPage={currentPage}
-              lastPage={lastPage}
+              lastPage={Math.ceil(articles.length / itemsPerPage)}
               onPageChange={handlePageChange}
             />
           ) : (
