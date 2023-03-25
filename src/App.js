@@ -2,12 +2,14 @@ import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from "./pages/Home";
-import NewYorkTimes from "./pages/NewYorkTimes";
-import TheGuardian from "./pages/TheGuardian";
+// import NewYorkTimes from "./pages/NewYorkTimes";
+// import TheGuardian from "./pages/TheGuardian";
 import News from "./pages/News";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ProtectedRoute from "./authentication/authGuard";
+import NewYorkTimes from "./components/NewYorkTimes";
+import TheGuardian from "./components/TheGuardian";
 
 function App() {
   return (
