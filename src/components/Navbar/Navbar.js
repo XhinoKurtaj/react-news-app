@@ -13,13 +13,11 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
 import AdbIcon from "@mui/icons-material/Adb";
-import axios from "axios";
-import { isAuthenticated } from "../authentication/isAuthenticated";
+import { isAuthenticated } from "../../authentication/isAuthenticated";
 import { useNavigate } from "react-router-dom";
+import API from "../../config/axiosConfig";
+import { Pages } from "./consts/items";
 
-import API from "../config/axiosConfig";
-
-const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Navbar() {
@@ -104,9 +102,9 @@ function Navbar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+              {Pages.map((page) => (
+                <MenuItem key={page.id} onClick={() => navigate(page.route)}>
+                  <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -131,15 +129,17 @@ function Navbar() {
             LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                {page}
-              </Button>
-            ))}
+            {Pages.map((page) => {
+              return (
+                <Button
+                  key={page.id}
+                  onClick={() => navigate(page.route)}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  {page.label}
+                </Button>
+              );
+            })}
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
