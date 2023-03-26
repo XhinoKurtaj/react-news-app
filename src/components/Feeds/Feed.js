@@ -12,6 +12,7 @@ import { updateFeed } from "../../redux/feedsReducer";
 
 export default function Feed(props) {
   const [feeds, setFeeds] = useState([]);
+  const [selectedFeed, setSelectedFeed] = useState("");
 
   const dispatch = useDispatch();
   const feedsData = useSelector((state) => state.FeedsReducer.feeds);
@@ -31,6 +32,7 @@ export default function Feed(props) {
   };
 
   const handleClick = (item) => {
+    setSelectedFeed(item.id);
     props.searchByFeed(item);
   };
 
@@ -69,12 +71,22 @@ export default function Feed(props) {
             <Grid container spacing={1}>
               {feeds.map((item) => (
                 <Grid item xs={6} lg={2}>
-                  <Chip
-                    key={item.id}
-                    label={`${item.type} | ${item.feed}`}
-                    onClick={() => handleClick(item)}
-                    onDelete={() => handleDelete(item.id)}
-                  />
+                  {item.id === selectedFeed ? (
+                    <Chip
+                      key={item.id}
+                      label={`${item.type} | ${item.feed}`}
+                      onClick={() => handleClick(item)}
+                      onDelete={() => handleDelete(item.id)}
+                    />
+                  ) : (
+                    <Chip
+                      key={item.id}
+                      label={`${item.type} | ${item.feed}`}
+                      onClick={() => handleClick(item)}
+                      onDelete={() => handleDelete(item.id)}
+                      variant="outlined"
+                    />
+                  )}
                 </Grid>
               ))}
             </Grid>
