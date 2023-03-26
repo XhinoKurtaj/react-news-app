@@ -2,32 +2,35 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { CardActionArea } from "@mui/material";
-import CardActions from "@mui/material/CardActions";
-
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 
 export default function ArticleCard(props) {
   const { article } = props;
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card className="root">
       <CardActionArea>
         <CardMedia
           component="img"
           height="140"
-          // image={props.article.urlToImage}
-          alt="the guardian"
+          image={
+            "https://1000logos.net/wp-content/uploads/2021/03/The-Guardian-logo-500x325.jpg"
+          }
+          alt="the guardians alt"
         />
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="div">
+        <CardContent className="content">
+          <Typography gutterBottom variant="h5" component="h2">
             {article.webTitle}
           </Typography>
         </CardContent>
-        <CardActions disableSpacing>
-          {article.sectionName}
-          <Typography>{article.webPublicationDate}</Typography>
-        </CardActions>
+        <div className="footer">
+          <Typography variant="body2" color="textSecondary" component="p">
+            {article.sectionName}
+          </Typography>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {new Date(article.webPublicationDate).toDateString()}
+          </Typography>
+        </div>
       </CardActionArea>
     </Card>
   );

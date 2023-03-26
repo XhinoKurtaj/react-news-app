@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Grid, TextField, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Container from "@mui/material/Container";
@@ -15,9 +15,17 @@ export default function SearchForm({ onSearch }) {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [sourceFilter, setSourceFilter] = useState("");
 
+  useEffect(() => {
+    const currentDate = new Date();
+    const currentTimestamp = currentDate.getTime();
+    const sevenDaysAgoTimestamp = currentTimestamp - 7 * 24 * 60 * 60 * 1000;
+    const sevenDaysAgoDate = new Date();
+    sevenDaysAgoDate.setTime(sevenDaysAgoTimestamp);
+    setDateFilter(dayjs(sevenDaysAgoDate));
+  }, []);
+
   const handleSearch = (event) => {
     event.preventDefault();
-
     const payload = {
       keyword: keyword,
       date: dayjs(dateFilter).format("YYYY-MM-DD"),
@@ -37,59 +45,58 @@ export default function SearchForm({ onSearch }) {
             onSubmit={handleSearch}
             sx={{ mt: 3 }}
           >
-            <Grid container spacing={1}>
-              <Grid item xs={12} lg={3}>
-                <TextField
-                  fullWidth
-                  name="keyword"
-                  label="keyword"
-                  type="text"
-                  id="keyword"
-                  value={keyword}
-                  onChange={(event) => setKeyword(event.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} lg={3}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateField
-                    fullWidth
-                    label="From Date"
-                    name="date"
-                    id="date"
-                    value={dateFilter}
-                    onChange={(newValue) => setDateFilter(newValue)}
-                    format="YYYY-MM-DD"
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12} lg={3}>
-                <TextField
-                  fullWidth
-                  name="category"
-                  label="category"
-                  type="text"
-                  id="category"
-                  value={categoryFilter}
-                  onChange={(event) => setCategoryFilter(event.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} lg={3}>
-                <TextField
-                  fullWidth
-                  name="source"
-                  label="source"
-                  type="text"
-                  id="source"
-                  value={sourceFilter}
-                  onChange={(event) => setSourceFilter(event.target.value)}
-                />
-              </Grid>
-            </Grid>
+            <TextField
+              fullWidth
+              name="keyword"
+              label="keyword"
+              type="text"
+              id="keyword"
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
+              sx={{ mt: 3 }}
+            />
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateField
+                fullWidth
+                label="From Date"
+                name="date"
+                id="date"
+                value={dateFilter}
+                onChange={(newValue) => setDateFilter(newValue)}
+                format="YYYY-MM-DD"
+                sx={{ mt: 3 }}
+              />
+            </LocalizationProvider>
+
+            <TextField
+              fullWidth
+              name="category"
+              label="category"
+              type="text"
+              id="category"
+              value={categoryFilter}
+              onChange={(event) => setCategoryFilter(event.target.value)}
+              sx={{ mt: 3 }}
+            />
+
+            <TextField
+              fullWidth
+              name="source"
+              label="source"
+              type="text"
+              id="source"
+              value={sourceFilter}
+              onChange={(event) => setSourceFilter(event.target.value)}
+              sx={{ mt: 3 }}
+            />
+
             <Button
               variant="outlined"
               type="submit"
               fullWidth
               startIcon={<SearchIcon />}
+              sx={{ mt: 3 }}
             >
               Search
             </Button>

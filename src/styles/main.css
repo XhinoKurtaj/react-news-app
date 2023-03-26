@@ -1,0 +1,54 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: "space-between";
+  width: 100%;
+  height: 350px;
+}
+
+.card-body {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.cart-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.content {
+  flex-grow: 1;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-around;
+}
+
+.scroll {
+  overflow-y: scroll;
+  height: 600px;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 10px; /* set the width of the scrollbar */
+}
+
+.scroll::-webkit-scrollbar-track {
+  background: #f1f1f1; /* set the background color of the track */
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  background: #888; /* set the color of the thumb */
+  border-radius: 5px; /* round the corners of the thumb */
+}
+
+.scroll::-webkit-scrollbar-thumb:hover {
+  background: #555; /* set the color of the thumb on hover */
+}

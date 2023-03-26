@@ -2,35 +2,46 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { CardActionArea } from "@mui/material";
-import CardActions from "@mui/material/CardActions";
-
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 
 export default function ArticleCard(props) {
   const { article } = props;
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card className="root">
       <CardActionArea>
         <CardMedia
           component="img"
           height="140"
           image={`https://www.nytimes.com/${article.multimedia[0]?.url}`}
-          alt="green iguana"
+          alt="new york times alt"
         />
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="div">
+        <CardContent className="content">
+          <Typography
+            gutterBottom
+            variant="h5"
+            component="h2"
+            className="cart-title"
+          >
             {article.headline.main}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            className="card-body"
+            component="p"
+          >
             {article.abstract}
           </Typography>
         </CardContent>
-        <CardActions disableSpacing>
-          {article.byline.original}
-          <Typography>{article.pub_date}</Typography>
-        </CardActions>
+        <div className="footer">
+          <Typography variant="body2" color="textSecondary" component="p">
+            {article.byline.original}
+          </Typography>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {new Date(article.pub_date).toDateString()}
+          </Typography>
+        </div>
       </CardActionArea>
     </Card>
   );

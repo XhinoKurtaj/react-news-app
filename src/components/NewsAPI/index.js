@@ -6,6 +6,8 @@ import SearchForm from "../Search/Search";
 import PaginationControlled from "../Pagination/Pagination";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import dayjs from "dayjs";
+import Grid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
 
 import Feed from "../Feeds/Feed";
 import API from "../../config/axiosConfig";
@@ -49,29 +51,35 @@ export default function NewsAPI() {
     <ThemeProvider theme={theme}>
       <h1>NewsAPI</h1>
       <main>
-        <Container maxWidth="lg">
-          <SearchForm onSearch={handleSearch} />
-          <br />
-          <Feed searchByFeed={feedSearch} />
-          <br />
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              <ArticleList articles={chunkOfArticles} />
-              <br />
-            </>
-          )}
+        <Container maxWidth="xl">
+          <Grid container spacing={2}>
+            <Grid item xs={12} lg={9}>
+              <Feed searchByFeed={feedSearch} />
+              <Divider sx={{ mb: 2, mt: 2 }} />
 
-          {articles.length > 0 ? (
-            <PaginationControlled
-              currentPage={currentPage}
-              lastPage={Math.ceil(articles.length / itemsPerPage)}
-              onPageChange={handlePageChange}
-            />
-          ) : (
-            ""
-          )}
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <ArticleList articles={chunkOfArticles} />
+              )}
+
+              {articles.length > 0 ? (
+                <>
+                  <Divider sx={{ mb: 2, mt: 2 }} />
+                  <PaginationControlled
+                    currentPage={currentPage}
+                    lastPage={Math.ceil(articles.length / itemsPerPage)}
+                    onPageChange={handlePageChange}
+                  />
+                </>
+              ) : (
+                ""
+              )}
+            </Grid>
+            <Grid item xs={12} lg={3}>
+              <SearchForm onSearch={handleSearch} />
+            </Grid>
+          </Grid>
         </Container>
       </main>
     </ThemeProvider>
