@@ -6,17 +6,29 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import API from "../../config/axiosConfig";
 import Swal from "sweetalert2";
+import { useSelector, useDispatch } from "react-redux";
+
+import { updateFeed } from "../../redux/feedsReducer";
 
 export default function Feed(props) {
   const [feeds, setFeeds] = useState([]);
 
+  const dispatch = useDispatch();
+  const feedsData = useSelector((state) => state.FeedsReducer.feeds);
+
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await API.get("feeds");
-      setFeeds(response.data.feeds);
-    };
-    fetchData();
-  }, []);
+    if (feedsData.length > 0) {
+      setFeeds(feedsData);
+    } else {
+      fetchData();
+    }
+  }, [feedsData]);
+
+  const fetchData = async () => {
+    const response = await API.get("feeds");
+    setFeeds(response.data.feeds);
+    dispatch(updateFeed(response.data.feeds));
+  };
 
   const handleClick = (item) => {
     props.searchByFeed(item);
@@ -26,6 +38,7 @@ export default function Feed(props) {
     let cpFeeds = [...feeds];
     cpFeeds.push(feed);
     setFeeds(cpFeeds);
+    dispatch(updateFeed(cpFeeds));
   };
 
   const handleDelete = (id) => {
@@ -42,6 +55,7 @@ export default function Feed(props) {
         await API.delete(`feed/${id}`);
         const updateFeeds = feeds.filter((object) => object.id !== id);
         setFeeds(updateFeeds);
+        dispatch(updateFeed(updateFeeds));
         Swal.fire("Deleted!", "Your file has been deleted.", "success");
       }
     });
