@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { Container } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Container, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
 import Divider from "@mui/material/Divider";
@@ -23,6 +23,7 @@ export default function NewYorkTimes() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [seachData, setSearchData] = useState({});
+  const [notFoundArticle, setNotFoundArticle] = useState(false);
 
   const dispatch = useDispatch();
   const dataArticles = useSelector((state) => state.NewsReducer.NewYorkTimes);
@@ -54,13 +55,19 @@ export default function NewYorkTimes() {
   };
 
   const handleSearch = async (payload) => {
+    setNotFoundArticle(false);
     setIsLoading(true);
     setSearchData(payload);
     payload.currentPage = currentPage;
     const response = await API.get("newyourktimes/news", { params: payload });
-    __dispatchToState(response);
-    __updateStates(response);
-    setIsLoading(false);
+    if (response.data.articles.length == 0) {
+      setIsLoading(false);
+      setNotFoundArticle(true);
+    } else {
+      __dispatchToState(response);
+      __updateStates(response);
+      setIsLoading(false);
+    }
   };
 
   const handlePageChange = async (event, value) => {
@@ -76,6 +83,7 @@ export default function NewYorkTimes() {
   };
 
   const feedSearch = async (item) => {
+    setNotFoundArticle(false);
     setIsLoading(true);
     const sevenDaysAgo = dayjs(new Date(getLastSevenDays())).format(
       "YYYY-MM-DD"
@@ -85,9 +93,14 @@ export default function NewYorkTimes() {
       date: sevenDaysAgo,
     };
     const response = await API.get("newyourktimes/news", { params: payload });
-    __dispatchToState(response);
-    __updateStates(response);
-    setIsLoading(false);
+    if (response.data.articles.length == 0) {
+      setIsLoading(false);
+      setNotFoundArticle(true);
+    } else {
+      __dispatchToState(response);
+      __updateStates(response);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -99,8 +112,24 @@ export default function NewYorkTimes() {
             <Grid item xs={12} lg={9}>
               <Feed searchByFeed={feedSearch} />
               <Divider sx={{ mb: 2, mt: 2 }} />
+
+              {notFoundArticle ? (
+                <main className="center-content">
+                  <Typography>
+                    <b>
+                      Sorry we couldn't find any article that match your
+                      criteria!
+                    </b>
+                  </Typography>
+                </main>
+              ) : (
+                ""
+              )}
+
               {isLoading ? (
-                <LoadingSpinner />
+                <main className="center-content">
+                  <LoadingSpinner />
+                </main>
               ) : (
                 <ArticleList articles={articles} />
               )}
@@ -110,7 +139,7 @@ export default function NewYorkTimes() {
                   <Divider sx={{ mb: 2, mt: 2 }} />
                   <PaginationControlled
                     currentPage={currentPage}
-                    lastPage={200}
+                    lastPage={lastPage > 200 ? 200 : lastPage}
                     onPageChange={handlePageChange}
                   />
                 </>

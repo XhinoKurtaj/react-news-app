@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { Container } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Container, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ArticleList from "./articles";
 import SearchForm from "../Search/Search";
@@ -14,7 +14,7 @@ import Feed from "../Feeds/Feed";
 import API from "../../config/axiosConfig";
 import { addNewsApi } from "../../redux/reducer";
 import { getLastSevenDays } from "../../Utils/Helper";
-
+import "../../styles/main.css";
 
 const theme = createTheme();
 export default function NewsAPI() {
@@ -22,6 +22,7 @@ export default function NewsAPI() {
   const [articles, setArticles] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [notFoundArticle, setNotFoundArticle] = useState(false);
   const itemsPerPage = 10;
 
   const dispatch = useDispatch();
@@ -33,11 +34,17 @@ export default function NewsAPI() {
   }, [dataArticles]);
 
   const handleSearch = async (payload) => {
+    setNotFoundArticle(false);
     setIsLoading(true);
     const response = await API.get("newsapi/news", { params: payload });
-    dispatch(addNewsApi({ articles: response.data.articles }));
-    setArticles(response.data.articles);
-    setIsLoading(false);
+    if (response.data.articles.length == 0) {
+      setIsLoading(false);
+      setNotFoundArticle(true);
+    } else {
+      dispatch(addNewsApi({ articles: response.data.articles }));
+      setArticles(response.data.articles);
+      setIsLoading(false);
+    }
   };
 
   const chunkOfArticles = articles.slice(
@@ -52,6 +59,7 @@ export default function NewsAPI() {
   };
 
   const feedSearch = async (item) => {
+    setNotFoundArticle(false);
     setIsLoading(true);
 
     const sevenDaysAgo = dayjs(new Date(getLastSevenDays())).format(
@@ -62,9 +70,14 @@ export default function NewsAPI() {
       date: sevenDaysAgo,
     };
     const response = await API.get("newsapi/news", { params: payload });
-    setArticles(response.data.articles);
-    dispatch(addNewsApi({ articles: response.data.articles }));
-    setIsLoading(false);
+    if (response.data.articles.length == 0) {
+      setIsLoading(false);
+      setNotFoundArticle(true);
+    } else {
+      dispatch(addNewsApi({ articles: response.data.articles }));
+      setArticles(response.data.articles);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -77,8 +90,23 @@ export default function NewsAPI() {
               <Feed searchByFeed={feedSearch} />
               <Divider sx={{ mb: 2, mt: 2 }} />
 
+              {notFoundArticle ? (
+                <main className="center-content">
+                  <Typography>
+                    <b>
+                      Sorry we couldn't find any article that match your
+                      criteria!
+                    </b>
+                  </Typography>
+                </main>
+              ) : (
+                ""
+              )}
+
               {isLoading ? (
-                <LoadingSpinner />
+                <main className="center-content">
+                  <LoadingSpinner />
+                </main>
               ) : (
                 <ArticleList articles={chunkOfArticles} />
               )}

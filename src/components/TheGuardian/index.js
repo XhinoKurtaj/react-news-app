@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
 import Divider from "@mui/material/Divider";
@@ -14,6 +14,7 @@ import Feed from "../Feeds/Feed";
 import API from "../../config/axiosConfig";
 import { addTheGuardian } from "../../redux/reducer";
 import { getLastSevenDays } from "../../Utils/Helper";
+import "../../styles/main.css";
 
 const theme = createTheme();
 export default function TheGuardian() {
@@ -23,6 +24,7 @@ export default function TheGuardian() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [seachData, setSearchData] = useState({});
+  const [notFoundArticle, setNotFoundArticle] = useState(false);
 
   const dispatch = useDispatch();
   const dataArticles = useSelector((state) => state.NewsReducer.TheGuardian);
@@ -54,13 +56,19 @@ export default function TheGuardian() {
   };
 
   const handleSearch = async (payload) => {
+    setNotFoundArticle(false);
     setIsLoading(true);
     setSearchData(payload);
     payload.currentPage = currentPage;
     const response = await API.get("guardian/news", { params: payload });
-    __dispatchToState(response);
-    __updateStates(response);
-    setIsLoading(false);
+    if (response.data.articles.length == 0) {
+      setIsLoading(false);
+      setNotFoundArticle(true);
+    } else {
+      __dispatchToState(response);
+      __updateStates(response);
+      setIsLoading(false);
+    }
   };
 
   const handlePageChange = async (event, value) => {
@@ -76,6 +84,7 @@ export default function TheGuardian() {
   };
 
   const feedSearch = async (item) => {
+    setNotFoundArticle(true);
     setIsLoading(true);
     const sevenDaysAgo = dayjs(new Date(getLastSevenDays())).format(
       "YYYY-MM-DD"
@@ -86,9 +95,14 @@ export default function TheGuardian() {
     };
     setSearchData(payload);
     const response = await API.get("guardian/news", { params: payload });
-    __dispatchToState(response);
-    __updateStates(response);
-    setIsLoading(false);
+    if (response.data.articles.length == 0) {
+      setIsLoading(false);
+      setNotFoundArticle(true);
+    } else {
+      __dispatchToState(response);
+      __updateStates(response);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -100,8 +114,23 @@ export default function TheGuardian() {
             <Grid item xs={12} lg={9}>
               <Feed searchByFeed={feedSearch} />
               <Divider sx={{ mb: 2, mt: 2 }} />
+              {notFoundArticle ? (
+                <main className="center-content">
+                  <Typography>
+                    <b>
+                      Sorry we couldn't find any article that match your
+                      criteria!
+                    </b>
+                  </Typography>
+                </main>
+              ) : (
+                ""
+              )}
+
               {isLoading ? (
-                <LoadingSpinner />
+                <main className="center-content">
+                  <LoadingSpinner />
+                </main>
               ) : (
                 <ArticleList articles={articles} />
               )}

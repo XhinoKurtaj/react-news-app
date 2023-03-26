@@ -6,9 +6,11 @@ import Typography from "@mui/material/Typography";
 
 export default function ArticleCard(props) {
   const { article } = props;
-
+  const goToArticle = () => {
+    window.open(article.web_url, "_blank", "noreferrer");
+  };
   return (
-    <Card className="root">
+    <Card className="root" onClick={goToArticle}>
       <CardActionArea>
         <CardMedia
           component="img"
