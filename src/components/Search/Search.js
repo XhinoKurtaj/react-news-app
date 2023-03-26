@@ -7,6 +7,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { Search as SearchIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
+import { getLastSevenDays } from "../../Utils/Helper";
 
 const theme = createTheme();
 export default function SearchForm({ onSearch }) {
@@ -16,12 +17,7 @@ export default function SearchForm({ onSearch }) {
   const [sourceFilter, setSourceFilter] = useState("");
 
   useEffect(() => {
-    const currentDate = new Date();
-    const currentTimestamp = currentDate.getTime();
-    const sevenDaysAgoTimestamp = currentTimestamp - 7 * 24 * 60 * 60 * 1000;
-    const sevenDaysAgoDate = new Date();
-    sevenDaysAgoDate.setTime(sevenDaysAgoTimestamp);
-    setDateFilter(dayjs(sevenDaysAgoDate));
+    setDateFilter(dayjs(getLastSevenDays()));
   }, []);
 
   const handleSearch = (event) => {

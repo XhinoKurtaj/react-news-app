@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
+import { useSelector, useDispatch } from "react-redux";
 
 import ArticleList from "./articles";
 import SearchForm from "../Search/Search";
@@ -11,28 +12,54 @@ import PaginationControlled from "../Pagination/Pagination";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import Feed from "../Feeds/Feed";
 import API from "../../config/axiosConfig";
+import { addNewYorkTimes } from "../../redux/reducer";
+import { getLastSevenDays } from "../../Utils/Helper";
 
 const theme = createTheme();
 export default function NewYorkTimes() {
   const [isLoading, setIsLoading] = useState(false);
   const [articles, setArticles] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
-  const [resultsPerPage, setResultsPerPage] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [seachData, setSearchData] = useState({});
+
+  const dispatch = useDispatch();
+  const dataArticles = useSelector((state) => state.NewsReducer.NewYorkTimes);
+
+  useEffect(() => {
+    if (Object.keys(dataArticles).length !== 0) {
+      setArticles(dataArticles.articles);
+      setTotalResults(dataArticles.totalResults);
+      setCurrentPage(dataArticles.currentPage);
+      setLastPage(dataArticles.lastPage);
+    }
+  }, [dataArticles]);
+
+  const __updateStates = (response) => {
+    setArticles(response.data.articles);
+    setTotalResults(response.data.totalResults);
+    setCurrentPage(response.data.currentPage);
+    setLastPage(response.data.lastPage);
+  };
+
+  const __dispatchToState = (response) => {
+    const storeData = {
+      articles: response.data.articles,
+      totalResults: response.data.totalResults,
+      currentPage: response.data.currentPage,
+      lastPage: response.data.lastPage,
+    };
+    dispatch(addNewYorkTimes(storeData));
+  };
 
   const handleSearch = async (payload) => {
     setIsLoading(true);
     setSearchData(payload);
     payload.currentPage = currentPage;
-
     const response = await API.get("newyourktimes/news", { params: payload });
-    setArticles(response.data.articles);
-    setTotalResults(response.data.totalResults);
-    setResultsPerPage(response.data.resultsPerPage);
-    setCurrentPage(response.data.currentPage);
-    setLastPage(response.data.lastPage);
+    __dispatchToState(response);
+    __updateStates(response);
     setIsLoading(false);
   };
 
@@ -42,31 +69,25 @@ export default function NewYorkTimes() {
       ...seachData,
       page: value,
     };
-
     const response = await API.get("newyourktimes/news", { params: payload });
-
-    setArticles(response.data.articles);
-    setTotalResults(response.data.totalResults);
-    setResultsPerPage(response.data.resultsPerPage);
-    setCurrentPage(value);
-    setLastPage(response.data.lastPage);
+    response.data.currentPage = value;
+    __updateStates(response);
     setIsLoading(false);
   };
 
   const feedSearch = async (item) => {
-    const currentDate = new Date();
-    const currentTimestamp = currentDate.getTime();
-    const sevenDaysAgoTimestamp = currentTimestamp - 7 * 24 * 60 * 60 * 1000;
-    const sevenDaysAgoDate = new Date();
-    sevenDaysAgoDate.setTime(sevenDaysAgoTimestamp);
-
+    setIsLoading(true);
+    const sevenDaysAgo = dayjs(new Date(getLastSevenDays())).format(
+      "YYYY-MM-DD"
+    );
     const payload = {
       [item.type]: item.feed,
-      fromDate: dayjs(sevenDaysAgoDate).format("YYYY-MM-DD"),
+      date: sevenDaysAgo,
     };
-    debugger;
     const response = await API.get("newyourktimes/news", { params: payload });
-    setArticles(response.data.articles);
+    __dispatchToState(response);
+    __updateStates(response);
+    setIsLoading(false);
   };
 
   return (

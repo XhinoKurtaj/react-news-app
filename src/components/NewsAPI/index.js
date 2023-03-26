@@ -8,9 +8,13 @@ import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import dayjs from "dayjs";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
+import { useSelector, useDispatch } from "react-redux";
 
 import Feed from "../Feeds/Feed";
 import API from "../../config/axiosConfig";
+import { addNewsApi } from "../../redux/reducer";
+import { getLastSevenDays } from "../../Utils/Helper";
+
 
 const theme = createTheme();
 export default function NewsAPI() {
@@ -20,9 +24,18 @@ export default function NewsAPI() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const dispatch = useDispatch();
+  const dataArticles = useSelector((state) => state.NewsReducer.NewsAPI);
+  useEffect(() => {
+    if (Object.keys(dataArticles).length !== 0) {
+      setArticles(dataArticles.articles);
+    }
+  }, [dataArticles]);
+
   const handleSearch = async (payload) => {
     setIsLoading(true);
     const response = await API.get("newsapi/news", { params: payload });
+    dispatch(addNewsApi({ articles: response.data.articles }));
     setArticles(response.data.articles);
     setIsLoading(false);
   };
@@ -39,12 +52,19 @@ export default function NewsAPI() {
   };
 
   const feedSearch = async (item) => {
+    setIsLoading(true);
+
+    const sevenDaysAgo = dayjs(new Date(getLastSevenDays())).format(
+      "YYYY-MM-DD"
+    );
     const payload = {
       [item.type]: item.feed,
-      fromDate: dayjs(new Date()).format("YYYY-MM-DD"),
+      date: sevenDaysAgo,
     };
     const response = await API.get("newsapi/news", { params: payload });
     setArticles(response.data.articles);
+    dispatch(addNewsApi({ articles: response.data.articles }));
+    setIsLoading(false);
   };
 
   return (
