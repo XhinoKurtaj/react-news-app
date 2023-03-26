@@ -9,8 +9,10 @@ import AdbIcon from "@mui/icons-material/Adb";
 import { useNavigate } from "react-router-dom";
 import API from "../../config/axiosConfig";
 import { Pages } from "./consts/items";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 function Navbar() {
+  const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -18,13 +20,16 @@ function Navbar() {
   }, []);
 
   const logout = async () => {
+    setLoading(true);
     try {
       await API.get("auth/logout");
       localStorage.removeItem("token");
       navigate("/login");
     } catch (err) {
+      setLoading(false);
       console.log(err);
     }
+    
   };
 
   return (
@@ -94,14 +99,16 @@ function Navbar() {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Button
-              variant="text"
-              textAlign="center"
+            <LoadingButton
               onClick={logout}
+              textAlign="center"
+              loading={loading}
+              loadingPosition="end"
+              variant="text"
               sx={{ color: "#fff" }}
             >
-              Logout
-            </Button>
+              <span> Logout</span>
+            </LoadingButton>
           </Box>
         </Toolbar>
       </Container>

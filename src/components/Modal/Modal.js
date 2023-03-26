@@ -6,9 +6,9 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import SendIcon from "@mui/icons-material/Send";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 import API from "../../config/axiosConfig";
 
@@ -26,21 +26,28 @@ const style = {
 
 export default function BasicModal(props) {
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
     const form = new FormData(event.currentTarget);
     const payload = {
       type: form.get("type"),
       feed: form.get("feed"),
     };
-    const response = await API.get("feed/create", { params: payload });
-    props.onCreate(response.data.feed);
-    handleClose();
+    try {
+      const response = await API.get("feed/create", { params: payload });
+      props.onCreate(response.data.feed);
+      setLoading(false);
+      handleClose();
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   return (
@@ -86,14 +93,16 @@ export default function BasicModal(props) {
               id="feed"
               autoComplete="feed"
             />
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
+              endIcon={<SendIcon />}
+              loading={loading}
+              loadingPosition="end"
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
             >
-              Save
-            </Button>
+              <span>Save</span>
+            </LoadingButton>
           </Box>
         </Box>
       </Modal>

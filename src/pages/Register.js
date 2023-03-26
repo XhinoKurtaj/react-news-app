@@ -1,6 +1,5 @@
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
@@ -10,16 +9,19 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 import API from "../config/axiosConfig";
 
 const theme = createTheme();
 
 export default function Register() {
+  const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
     const data = new FormData(event.currentTarget);
 
     let payload = JSON.stringify({
@@ -31,8 +33,10 @@ export default function Register() {
     try {
       const response = await API.post("auth/register", payload);
       localStorage.setItem("token", response.data.token);
+      setLoading(false);
       navigate("/");
     } catch (err) {
+      setLoading(false);
       console.log(err);
     }
   };
@@ -94,14 +98,17 @@ export default function Register() {
                 />
               </Grid>
             </Grid>
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
+              loading={loading}
+              loadingPosition="end"
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
-            </Button>
+              <span> Sign Up</span>
+            </LoadingButton>
+
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/login" variant="body2">
