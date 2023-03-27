@@ -84,7 +84,7 @@ export default function TheGuardian() {
   };
 
   const feedSearch = async (item) => {
-    setNotFoundArticle(true);
+    setNotFoundArticle(false);
     setIsLoading(true);
     const sevenDaysAgo = dayjs(new Date(getLastSevenDays())).format(
       "YYYY-MM-DD"
